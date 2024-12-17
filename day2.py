@@ -1,36 +1,53 @@
+# Part 1
 
+def is_valid_sequence(sequence: list[int]) -> int:
+    is_increasing = sequence[0] < sequence[1]
+    is_valid = True
+
+    for i in range(len(sequence) - 1):
+        if is_increasing and sequence[i + 1] <= sequence[i]:
+            is_valid = False
+            break
+        elif not is_increasing and sequence[i + 1] >= sequence[i]:
+            is_valid = False
+            break
+
+        if abs(sequence[i] - sequence[i + 1]) > 3:
+            is_valid = False
+            break
+
+    return 1 if is_valid else 0
+
+
+# Reading data from file
 with open("data/2.txt", "r") as file:
     data = [list(map(int, line.split())) for line in file]
 
-print(len(data))
+# Counting valid sequences
+valid_sequence_count = sum(is_valid_sequence(seq) for seq in data)
 
-""""
-48, 45, 43, 41, 38, 37, 34
+print(valid_sequence_count)
 
-1. make sure all go up or all go down
-2. make sure the interval is always at most 3
 
-"""
+# Part 2
+def get_subsequences(sequence: list[int]) -> list[list[int]]:
+    subsequences = []
+    for i in range(len(sequence)):
+        subsequences.append([sequence[x] for x in range(len(sequence)) if x != i])
+    return subsequences
 
-valid = 0
 
-for element in data:
-    direction = element[0] < element[1]
-    is_valid = True
+# Counting valid sequences with one element allowed to be wrong
+valid_with_one_error_count = 0
 
-    for i in range(0, len(element) - 1):
-        if direction and element[i+1] <= element[i]:
-            is_valid = False
-            break
-        elif not direction and element[i + 1] >= element[i]:
-            is_valid = False
-            break
+for sequence in data:
+    if is_valid_sequence(sequence):
+        valid_with_one_error_count += 1
+    else:
+        subsequences = get_subsequences(sequence)
+        for subsequence in subsequences:
+            if is_valid_sequence(subsequence):
+                valid_with_one_error_count += 1
+                break
 
-        if abs(element[i] - element[i+1]) > 3:
-            is_valid = False
-            break
-
-    if is_valid:
-        valid += 1
-
-print(valid)
+print(valid_with_one_error_count)
